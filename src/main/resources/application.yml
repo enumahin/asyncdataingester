@@ -1,0 +1,42 @@
+server:
+  port: 8040
+
+spring:
+  application:
+    name: "asyndataingester"
+  cloud:
+    function:
+      definition: ingestion;patientIngestion;demographicIngestion;clinicalIngestion;labIngestion;pharmacyIngestion;tuberculosisIngestion;testingServicesIngestion
+    stream:
+      bindings:
+        ingestion-in-0:
+          destination: raw-data
+          group: ${spring.application.name}
+          content-type: application/octet-stream
+        patientIngestion-out-0:
+          destination: patient-data
+        demographicIngestion-out-0:
+          destination: demographic-data
+        clinicalIngestion-out-0:
+          destination: clinical-data
+        labIngestion-out-0:
+          destination: lab-data
+        pharmacyIngestion-out-0:
+          destination: pharmacy-data
+        tuberculosisIngestion-out-0:
+          destination: tuberculosis-data
+        testingServicesIngestion-out-0:
+          destination: testing-services-data
+      rabbit:
+        bindings:
+          ingestion-in-0:
+            consumer:
+              autoBindDlq: true
+              republishToDlq: true
+              maxConcurrency: 5
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    username: "guest"
+    password: "guest"
+    connection-timeout: 10s
